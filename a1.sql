@@ -34,14 +34,21 @@ INSERT INTO Query1bx
 -- find pids they both offer in their catalog, but which we do not have inventory of. 
 -- Return the columns as pid, sid1, sid2, cost1, cost2.
 INSERT INTO Query1ci 
-SELECT pid, sid1, sid2, cost1, cost2
+-- since i later renamed pid as pid1 and pid2, I rename here to meet the requirement of the question
+SELECT pid1 AS pid, sid1, sid2, cost1, cost2
+-- the subquery creates a table supplier with columns from Subsuppliers, where sid as sid1 and subid as sid2
 FROM (SELECT sid AS sid1, subid AS sid2 FROM Subsuppliers) AS supplier 
+-- the subquery renames the columns of Catalog to pid1, sid1, and cost1, renames Catalog to Catalog1, and select only the tuples
+-- with product that are not in UTSC inventory.
+-- then, join this and the previous table based on sid1
 JOIN (SELECT pid1, sid1, cost1 FROM Catalog as Catalog1 WHERE pid1 IN (SELECT pid FROM Inventory WHERE quantity = 0))
 ON supplier.sid1 = Catalog1.sid1
+-- the subquery renames the columns of Catalog to pid2, sid2, and cost2, renames Catalog to Catalog2, and select only the tuples
+-- with product that are not in UTSC inventory.
+-- then, join this and the previous tables based on sid2 and based on pid (to make sure the two suppliers sell the same product). 
+-- Now there should be 3 tables joined together.
 JOIN (SELECT pid2, sid2, cost2 FROM Catalog as Catalog2 WHERE pid2 IN (SELECT pid FROM Inventory WHERE quantity = 0))
 ON supplier.sid2 = Catalog2.sid2 AND Catalog1.pid1 = Catalog2.pid2
-
-
 
 -- Query 1c ii --------------------------------------------------
 INSERT INTO Query1cii
