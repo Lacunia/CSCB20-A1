@@ -34,7 +34,14 @@ INSERT INTO Query1bx
 -- find pids they both offer in their catalog, but which we do not have inventory of. 
 -- Return the columns as pid, sid1, sid2, cost1, cost2.
 INSERT INTO Query1ci 
-FROM Subsuppliers AS supplier 1 JOIN Catalog USING sid 
+SELECT pid, sid1, sid2, cost1, cost2
+FROM (SELECT sid AS sid1, subid AS sid2 FROM Subsuppliers) AS supplier 
+JOIN (SELECT pid1, sid1, cost1 FROM Catalog as Catalog1 WHERE pid1 IN (SELECT pid FROM Inventory WHERE quantity = 0))
+ON supplier.sid1 = Catalog1.sid1
+JOIN (SELECT pid2, sid2, cost2 FROM Catalog as Catalog2 WHERE pid2 IN (SELECT pid FROM Inventory WHERE quantity = 0))
+ON supplier.sid2 = Catalog2.sid2 AND Catalog1.pid1 = Catalog2.pid2
+
+
 
 -- Query 1c ii --------------------------------------------------
 INSERT INTO Query1cii
