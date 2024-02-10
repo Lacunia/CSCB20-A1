@@ -30,7 +30,11 @@ INSERT INTO Query1bix
 INSERT INTO Query1bx
 
 -- Query 1c i --------------------------------------------------
-INSERT INTO Query1ci
+-- For each pair of suppliers that have a “business relationship” (*1) with each other, 
+-- find pids they both offer in their catalog, but which we do not have inventory of. 
+-- Return the columns as pid, sid1, sid2, cost1, cost2.
+INSERT INTO Query1ci 
+FROM Subsuppliers AS supplier 1 JOIN Catalog USING sid 
 
 -- Query 1c ii --------------------------------------------------
 INSERT INTO Query1cii
