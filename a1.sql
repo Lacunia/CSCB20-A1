@@ -51,13 +51,60 @@ JOIN (SELECT pid2, sid2, cost2 FROM Catalog as Catalog2 WHERE pid2 IN (SELECT pi
 ON supplier.sid2 = Catalog2.sid2 AND Catalog1.pid1 = Catalog2.pid2
 
 -- Query 1c ii --------------------------------------------------
+-- For each pid, find the suppliers that have products listed in their catalog at the exact same price. 
+-- Return the columns as pid, sid, cost. ???????????
 INSERT INTO Query1cii
+SELECT Catalog1.pid, Catalog1.sid, Catalog1.cost
+FROM Catalog AS Catalog1
+JOIN Catalog AS Catalog2 
+ON Catalog1.pid = Catalog2.pid AND  Catalog1.sid = Catalog2.sid 
 
 -- Query 1c iii --------------------------------------------------
+-- Find the pids that have been listed as at least 3 different tags. However, one of the tags must be ‘PPE’, 
+-- and one of them must not be ‘Super Tech’. Return columns containing the pid, pname, cost.
 INSERT INTO Query1ciii
+SELECT pid1 AS pid, pname, cost
+-- this table only contain products with tag of 'PPE' to make sure one of the tag is 'PPE'
+FROM (SELECT pid AS pid1, tagname AS tagname1 FROM ProductTag WHERE tagname1 = 'PPE') AS Tag1
+-- this table make sure there is not 'Super Tech' tag, and that the second tag is different from first tag 
+JOIN (SELECT pid AS pid2, tagname AS tagname2 FROM ProductTag WHERE tagname2 != 'Super Tech') AS Tag2 
+ON Tag1.pid1 = Tag2.pid2 AND tagname1 != tagname2 
+-- this table make sure there is not 'Super Tech' tag, and that the third tag is different from previous two tags
+JOIN (SELECT pid AS pid3, tagname AS tagname3 FROM ProductTag WHERE tagname3 != 'Super Tech') AS Tag3
+ON Tag1.pid1 = Tag2.pid3 AND tagname3 != tagname1 AND tagname3 != tagname2
+-- Join catalog to get the cost
+JOIN Catalog
+ON Tag1.pid1 = Catalog.pid 
+-- Join product to get the pname
+JOIN Product 
+ON Tag1.pid1 = Product.pid
 
 -- Query 1c iv  --------------------------------------------------
+-- For each pair of “reciprocal subsuppliers”(*2), find all of their “uncommon subsuppliers”(*3). 
+-- Every uncommon subsupplier of the pair should have only one row. Return the sid of the reciprocal subsuppliers, 
+-- along with the sid, name and address of the uncommon subsupplier.
 INSERT INTO Query1civ
+-- any sid starting with resid are the reciprocol suppliers
+SELECT DISTINCT reciprocal1.sid1, reciprocal1.sid2, uncommon.subsid, uncommon.subname, uncommon.subaddress
+FROM (SELECT sid AS sid1, subid As sid2 FROM Subsuppliers) AS reciprocal1
+JOIN (SELECT sid AS sid1, subid As sid2 FROM Subsuppliers) AS reciprocal2
+ON reciprocal1.sid1 = reciprocal2.sid2 AND reciprocal1.sid2 = reciprocal2.sid1 
+      -- we get the subsuppliers for reciprocal supplier 1, where the subsuppliers are not the reciprocal supplier 2
+      -- we exclude subsuppliers that are also subsuppliers of reciprocal supplier 2
+JOIN (SELECT sid, subid, subname, subaddress FROM Subsuppliers 
+      WHERE Subsuppliers.sid = reciprocal1.sid1 AND Subsuppliers.subid != reciprocal1.sid2 AND
+      subid NOT IN (SELECT subid FROM Subsuppliers WHERE Subsuppliers.sid = reciprocal1.sid2 AND Subsuppliers.subid != reciprocal.sid1)
+      UNION
+      -- we get the subsuppliers for reciprocal supplier 2, where the subsuppliers are not the reciprocal supplier 1
+      -- we exclude subsuppliers that are also subsuppliers of reciprocal supplier 1
+      SELECT sid, subid, subname, subaddress FROM Subsuppliers 
+      WHERE Subsuppliers.sid = reciprocal1.sid2 AND Subsuppliers.subid != reciprocal1.sid1 AND
+      subid NOT IN (SELECT subid FROM Subsuppliers WHERE Subsuppliers.sid = reciprocal1.sid1 AND Subsuppliers.subid != reciprocal.sid2)
+     ) AS uncommon
+ON reciprocal1.sid1 = uncommon.sid OR reciprocal1.sid2 = uncommon.sid
+-- The above query joins all uncommon suppliers to the reciprocal suppliers based on reciprocal suppliers' id
+
+
 
 -- Query 2 i --------------------------------------------------
 INSERT INTO Query2i
