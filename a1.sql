@@ -84,8 +84,8 @@ ON Tag1.pid1 = Product.pid
 -- Every uncommon subsupplier of the pair should have only one row. Return the sid of the reciprocal subsuppliers, 
 -- along with the sid, name and address of the uncommon subsupplier.
 INSERT INTO Query1civ
--- any sid starting with resid are the reciprocol suppliers
 SELECT DISTINCT reciprocal1.sid1, reciprocal1.sid2, uncommon.subsid, uncommon.subname, uncommon.subaddress
+-- First, we find pairs that are reciprocal subsuppliers
 FROM (SELECT sid AS sid1, subid As sid2 FROM Subsuppliers) AS reciprocal1
 JOIN (SELECT sid AS sid1, subid As sid2 FROM Subsuppliers) AS reciprocal2
 ON reciprocal1.sid1 = reciprocal2.sid2 AND reciprocal1.sid2 = reciprocal2.sid1 
