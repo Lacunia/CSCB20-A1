@@ -2,6 +2,42 @@
 -- after you have populated the answer table for that question.
 -- Good Luck!
 
+CREATE TABLE Subsuppliers
+      (sid: integer, 
+      subid: integer, 
+      sname: text, 
+      saddress: text, 
+      scountry: text, 
+      subname: text, 
+      subaddress: text, 
+      subcountry: text)
+
+CREATE TABLE Suppliers
+      (sid: integer, 
+      sname: text, 
+      saddress: text, 
+      scountry: text)
+
+CREATE TABLE Product 
+      (pid: integer, 
+      pname: text)
+
+CREATE TABLE ProductTag 
+      (tid: integer, 
+      pid: integer, 
+      tagname: text)
+
+CREATE TABLE Catalog 
+      (sid: integer, 
+      pid: integer, 
+      cost: real)
+
+CREATE TABLE Inventory 
+      (pid: integer, 
+      quantity: integer)
+
+A tuple in this relation represents how much of a product the University has in stock.
+
 -- Query 1b i --------------------------------------------------
 INSERT INTO Query1bi
 
