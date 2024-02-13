@@ -1,7 +1,7 @@
 -- If you define any views for a question (you are encouraged to), you must drop them
 -- after you have populated the answer table for that question.
 -- Good Luck!
-
+-- note: make sure to clean the query tables before testing.
 -- Query 1b i --------------------------------------------------
 INSERT INTO Query1bi 
 
@@ -28,6 +28,7 @@ INSERT INTO Query1bix
 
 -- Query 1b x --------------------------------------------------
 INSERT INTO Query1bx
+
 
 -- Query 1c i --------------------------------------------------
 -- For each pair of suppliers that have a “business relationship” (*1) with each other, 
@@ -58,9 +59,9 @@ INSERT INTO Query1cii
 SELECT Catalog2.pid, Catalog2.sid, Catalog2.cost
 FROM Catalog AS Catalog1
 JOIN Catalog AS Catalog2 
-ON Catalog1.pid = Catalog2.pid AND Catalog1.cost = Catalog2.cost;
+ON Catalog1.pid = Catalog2.pid AND Catalog1.cost = Catalog2.cost AND Catalog1.sid != Catalog2.sid;
 
-
+	
 -- Query 1c iii --------------------------------------------------
 -- Find the pids that have been listed as at least 3 different tags. However, one of the tags must be ‘PPE’, 
 -- and one of them must not be ‘Super Tech’. Return columns containing the pid, pname, cost.
@@ -111,6 +112,7 @@ ON Subsuppliers.sid = reciprocal1.sid2 AND Subsuppliers.subid != reciprocal1.sid
 WHERE subid NOT IN (SELECT subid FROM Subsuppliers WHERE Subsuppliers.sid = reciprocal1.sid1 AND Subsuppliers.subid != reciprocal1.sid2)
 
 
+-- note: make sure to clean the query tables before testing.
 -- Query 2 i --------------------------------------------------
 INSERT INTO Query2i
 

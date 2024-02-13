@@ -1,3 +1,8 @@
+DELETE FROM Query1ci;
+DELETE FROM Query1cii;
+DELETE FROM Query1ciii;
+DELETE FROM Query1civ;
+
 INSERT INTO Query1ci
 -- since i later renamed pid as pid1 and pid2, I rename here to meet the requirement of the question 
 SELECT pid1 AS pid, supplier.sid1, supplier.sid2, cost1, cost2
@@ -23,7 +28,7 @@ INSERT INTO Query1cii
 SELECT Catalog2.pid, Catalog2.sid, Catalog2.cost
 FROM Catalog AS Catalog1
 JOIN Catalog AS Catalog2 
-ON Catalog1.pid = Catalog2.pid AND Catalog1.cost = Catalog2.cost;
+ON Catalog1.pid = Catalog2.pid AND Catalog1.cost = Catalog2.cost AND Catalog1.sid != Catalog2.sid;
 
 	
 	
