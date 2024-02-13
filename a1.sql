@@ -109,7 +109,7 @@ ON reciprocal1.sid1 = reciprocal2.sid2 AND reciprocal1.sid2 = reciprocal2.sid1
 -- we exclude subsuppliers that are also subsuppliers of reciprocal supplier 1
 JOIN Subsuppliers 
 ON Subsuppliers.sid = reciprocal1.sid2 AND Subsuppliers.subid != reciprocal1.sid1
-WHERE subid NOT IN (SELECT subid FROM Subsuppliers WHERE Subsuppliers.sid = reciprocal1.sid1 AND Subsuppliers.subid != reciprocal1.sid2)
+WHERE subid NOT IN (SELECT subid FROM Subsuppliers WHERE Subsuppliers.sid = reciprocal1.sid1 AND Subsuppliers.subid != reciprocal1.sid2);
 
 
 -- note: make sure to clean the query tables before testing.
