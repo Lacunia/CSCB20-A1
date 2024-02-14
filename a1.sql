@@ -226,12 +226,28 @@ ON Approved.roomid = Room.roomid AND Occupancy.alertlevel > Room.alertthreshold;
 
 -- Query 2 vi --------------------------------------------------
 INSERT INTO Query2vi
+SELECT utorid
+FROM (SELECT utorid, roomid FROM Occupancy WHERE Occupancy.data BETWEEN 2021-03-17 AND 2022-12-31) AS Occupied
+
+EXCEPT
+
+(SELECT *
+FROM Approved);
 
 -- Query 2 vii --------------------------------------------------
 INSERT INTO Query2vii
 
+
 -- Query 2 viii --------------------------------------------------
 INSERT INTO Query2viii
+SELECT Member.utorid, Member.email
+FROM (((Student
+JOIN Member
+ON Student.utorid = Member.utorid AND Member.vacstatus = 0)
+JOIN Occupancy
+ON Student.utorid = Occupancy.utorid AND Member.utorid = Occupancy.utorid)
+JOIN Room 
+ON Occupancy.roomid = Room.roomid AND Occupancy.alertlevel > Room.alertthreshold);
 
 
 
