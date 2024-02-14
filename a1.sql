@@ -219,7 +219,7 @@ JOIN Approved
 ON Student_O_L.utorid = Approved.utorid
 -- joining Occupancy table to find out all occurences of these rooms being occupied between 2022-09-01 and 2022-12-31
 JOIN Occupancy
-ON Approved.roomid = Occupancy.roomid AND (Occupancy.date BETWEEN 2022-09-01 AND 2022-12-31)
+ON Approved.roomid = Occupancy.roomid AND (Occupancy.date Between 2022-09-01 AND 2022-12-31)
 -- joining Room table to find all occurences of when alert level is above the alert threshold level
 JOIN Room
 ON Approved.roomid = Room.roomid AND Occupancy.alertlevel > Room.alertthreshold;
@@ -227,7 +227,7 @@ ON Approved.roomid = Room.roomid AND Occupancy.alertlevel > Room.alertthreshold;
 -- Query 2 vi --------------------------------------------------
 INSERT INTO Query2vi
 SELECT utorid
-FROM (SELECT utorid, roomid FROM Occupancy WHERE Occupancy.data BETWEEN 2021-03-17 AND 2022-12-31) AS Occupied
+FROM (SELECT utorid, roomid FROM Occupancy WHERE Occupancy.data Between 2021-03-17 AND 2022-12-31) AS Occupied
 
 EXCEPT
 
@@ -236,6 +236,8 @@ FROM Approved);
 
 -- Query 2 vii --------------------------------------------------
 INSERT INTO Query2vii
+SELECT SUM(salary)
+FROM Employee;
 
 
 -- Query 2 viii --------------------------------------------------
