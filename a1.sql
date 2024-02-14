@@ -7,6 +7,18 @@ INSERT INTO Query1bi
 
 -- Query 1b ii --------------------------------------------------
 INSERT INTO Query1bii
+SELECT sid 
+FROM (SELECT * FROM ProductTag WHERE tagname = 'PPE') AS ppe
+JOIN Catalog 
+ON ppe.pid = Catalog.pid
+WHERE cost < 10
+INTERSECT 
+SELECT sid 
+FROM (SELECT * FROM ProductTag WHERE tagname = 'PPE') AS ppe
+JOIN Catalog 
+ON ppe.pid = Catalog.pid
+WHERE cost > 420
+
 
 -- Query 1b iii --------------------------------------------------
 INSERT INTO Query1biii
@@ -226,28 +238,36 @@ ON Approved.roomid = Room.roomid AND Occupancy.alertlevel > Room.alertthreshold;
 
 -- Query 2 vi --------------------------------------------------
 INSERT INTO Query2vi
+-- select utorid of occupancy of rooms that are not approved within this time period
 SELECT utorid
+-- from a table that contains all the occupancy occurences between the desired dates
 FROM (SELECT utorid, roomid FROM Occupancy WHERE Occupancy.data Between 2021-03-17 AND 2022-12-31) AS Occupied
 
 EXCEPT
 
+-- only containing approved occupancy of rooms
 (SELECT *
 FROM Approved);
 
 -- Query 2 vii --------------------------------------------------
 INSERT INTO Query2vii
+-- using the SUM() function, adding up the salary column in the Employee table
 SELECT SUM(salary)
 FROM Employee;
 
 
 -- Query 2 viii --------------------------------------------------
 INSERT INTO Query2viii
+--selecting the utorid and email of students with vaxstatus '0' and exceeded any room's alert threshold
 SELECT Member.utorid, Member.email
+-- finds all students with vacstatus '0'
 FROM (((Student
 JOIN Member
 ON Student.utorid = Member.utorid AND Member.vacstatus = 0)
+-- finds all occurences of the students with vacstatus '0' occupying a space
 JOIN Occupancy
 ON Student.utorid = Occupancy.utorid AND Member.utorid = Occupancy.utorid)
+-- finds all occurences of the students with vacstatus '0' occupying a space that exceeds the room's alert threshold
 JOIN Room 
 ON Occupancy.roomid = Room.roomid AND Occupancy.alertlevel > Room.alertthreshold);
 
