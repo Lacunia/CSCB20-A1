@@ -115,6 +115,20 @@ WHERE subid NOT IN (SELECT subid FROM Subsuppliers WHERE Subsuppliers.sid = reci
 -- note: make sure to clean the query tables before testing.
 -- Query 2 i --------------------------------------------------
 INSERT INTO Query2i
+-- Selecting the table containing all the utorid from the Student table
+SELECT utorid
+FROM Student
+
+-- Subtracting the latter from the entire Student table
+EXCEPT
+
+-- Selecting all those utorids that are indeed approved for the room 'IC404'
+-- Select all utorid and theta join with the list of approved utorids for the room 'IC404'
+(SELECT utorid
+FROM Student
+-- Selected all the utorids that have access to room 'IC404'
+JOIN(SELECT * FROM Room JOIN Approved ON Room.roomid = Approved.roomid WHERE roomname = 'IC404') AS Approved1
+ON Student.utorid = Approved1.utorid);
 
 -- Query 2 ii --------------------------------------------------
 INSERT INTO Query2ii
