@@ -132,6 +132,13 @@ ON Student.utorid = Approved1.utorid);
 
 -- Query 2 ii --------------------------------------------------
 INSERT INTO Query2ii
+-- Getting the rooms that are approved for employees
+SELECT utorid
+FROM (SELECT utorid AS utorid1, roomid AS roomid1 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved1 
+JOIN (SELECT utorid AS utorid2, roomid AS roomid2 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved2
+ON Approved1.utorid1 = Approved2.utorid2 AND Approved1.roomid1 != Approved2.roomid2
+JOIN (SELECT utorid AS utorid3, roomid AS roomid3 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved3
+ON Approved1.utorid1 = Approved3.utorid3 AND Approved1.roomid1 != Approved3.roomid3 AND Approved.roomid2 != Approved.roomid3;
 
 -- Query 2 iii --------------------------------------------------
 INSERT INTO Query2iii
