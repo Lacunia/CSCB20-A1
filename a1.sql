@@ -47,6 +47,23 @@ INSERT INTO Query1bv
 
 -- Query 1b vi --------------------------------------------------
 INSERT INTO Query1bvi
+SELECT pid
+FROM ((SELECT * FROM Catalog
+JOIN Suppliers
+ON Catalog.sid = Suppliers.sid
+JOIN ProductTag
+ON Catalog.pid = ProductTag.pid) AS table1
+
+CROSS JOIN
+
+(SELECT *
+FROM Catalog
+JOIN Suppliers
+ON Catalog.sid = Suppliers.sid
+JOIN ProductTag
+ON Catalog.pid = ProductTag.pid
+WHERE Suppliers.scountry = 'USA' AND ProductTag.tagname = 'Supertech') AS table2)
+WHERE table1.pid = table2.pid AND table1.sid != table2.sid;
 
 -- Query 1b vii --------------------------------------------------
 INSERT INTO Query1bvii
