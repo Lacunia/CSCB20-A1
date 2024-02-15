@@ -30,6 +30,14 @@ WHERE cost > 420;
 
 -- Query 1b iii --------------------------------------------------
 INSERT INTO Query1biii
+SELECT sid 
+FROM Suppliers
+-- we get rid of those who sell PPE at a cost of less than 10 or greater than 1337
+EXCEPT
+SELECT sid 
+FROM (SELECT * FROM ProductTag WHERE tagname = ‘PPE’) AS ppe
+JOIN (SELECT * FROM Catalog WHERE cost < 10 OR cost > 1337) AS RequiredCost
+ON ppe.pid = RequiredCost.pid;
 
 -- Query 1b iv  --------------------------------------------------
 INSERT INTO Query1biv
@@ -45,12 +53,14 @@ INSERT INTO Query1bvii
 
 -- Query 1b ix --------------------------------------------------
 INSERT INTO Query1bix
--- SELECT pid
--- FROM( SELECT pid, COUNT(pid)
---     FROM Catalog 
---     WHERE cost < 69 
---     GROUP BY pid
---     HAVING COUNT(pid) = (SELECT COUNT(sid) FROM Suppliers));
+SELECT pid
+FROM( 
+      SELECT pid, COUNT(pid)
+      FROM Catalog 
+      WHERE cost < 69 
+      GROUP BY pid
+      HAVING COUNT(pid) = (SELECT COUNT(sid) FROM Suppliers)
+);
 
 -- Query 1b x --------------------------------------------------
 INSERT INTO Query1bx
