@@ -356,7 +356,7 @@ EXCEPT
 -- only containing approved occupancy of rooms
 SELECT *
 FROM Approved
-);
+) AS wanted;
 
 
 -- Query 2 vii --------------------------------------------------
