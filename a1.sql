@@ -113,6 +113,7 @@ FROM( SELECT pid, COUNT(pid)
     GROUP BY pid
     HAVING COUNT(pid) = (SELECT COUNT(sid) FROM Suppliers))AS Wanted;
 
+
 -- Query 1b x --------------------------------------------------
 INSERT INTO Query1bx
 -- pid of items that have a quantity of 0 in inventory
@@ -124,14 +125,9 @@ UNION
 
 -- pid of items that do not exist in inventory
 -- all the products
-(SELECT pid
-FROM Product
-
-EXCEPT
-
--- all the products in Inventory
 SELECT pid
-FROM Inventory);
+FROM Product
+WHERE pid NOT IN (SELECT pid FROM Inventory);
 
 
 DELETE FROM Query1ci;
