@@ -47,12 +47,11 @@ ON ppe.pid = RequiredCost.pid;
 INSERT INTO Query1biv
 -- find sids of suppliers who supply every type of 'Cleaning' products in their catalog
 SELECT sid
-FROM(
-      SELECT sid, COUNT(pid)
+FROM( SELECT sid, COUNT(Catalog.pid)
       FROM Catalog JOIN ProductTag ON Catalog.pid = ProductTag.pid
       WHERE tagname = 'Cleaning' 
       GROUP BY sid 
-      HAVING COUNT(pid) = (SELECT COUNT pid FROM ProductTag WHERE tagname = 'Cleaning')
+      HAVING COUNT(Catalog.pid) = (SELECT COUNT(Catalog.pid) FROM ProductTag WHERE tagname = 'Cleaning')
 ) AS Wanted;
 
 
@@ -64,13 +63,13 @@ SELECT supplier1.sid, supplier2.sid
 FROM Catalog AS supplier1 
 JOIN Catalog AS supplier2 
 ON supplier1.pid = supplier2.pid
-WHERE supplier1.sid < supplier2.sid AND supplier1.cost >= (supplier2.cost * 1.2);
+WHERE supplier1.cost >= (supplier2.cost * 1.2);
 
 
 -- Query 1b vi --------------------------------------------------
 INSERT INTO Query1bvi
 -- find pids supplied by at least two different suppliers
-SELECT pid
+SELECT DISTINCT pid1
 FROM (SELECT sid AS sid1, pid AS pid1 FROM Catalog) AS Catalog1
 JOIN (SELECT sid AS sid2, pid AS pid2 FROM Catalog) AS Catalog2
 ON Catalog1.pid1 = Catalog2.pid2 AND Catalog1.sid1 != Catalog2.sid2;
@@ -78,31 +77,33 @@ ON Catalog1.pid1 = Catalog2.pid2 AND Catalog1.sid1 != Catalog2.sid2;
 -- Query 1b vii --------------------------------------------------
 INSERT INTO Query1bvii
 -- A copy that stores the requirements
-SELECT sid, cost
-FROM (SELECT * FROM ProductTag WHERE tagname = 'SuperTech') AS SuperTech
+SELECT sid
+FROM(
+SELECT Suppliers.sid, cost
+FROM (SELECT * FROM ProductTag WHERE tagname = 'Super Tech') AS SuperTech
 JOIN Catalog
 ON SuperTech.pid = Catalog.pid
 JOIN Suppliers
-ON SuperTech.sid = Suppliers.sid
+ON Catalog.sid = Suppliers.sid
 WHERE Suppliers.scountry = 'USA'
 
 EXCEPT
 
 -- A copy that stores the more expensive 'Super Tech' in 'USA'
-SELECT sid, cost
+SELECT Supplier1.sid, cost
 FROM (SELECT * FROM ProductTag
 JOIN Catalog
-ON SuperTech.pid = Catalog.pid
+ON ProductTag.pid = Catalog.pid
 JOIN Suppliers
-ON SuperTech.sid = Suppliers.sid
-WHERE Suppliers.scountry = 'USA' AND ProductTag.tagname = 'SuperTech') AS Supplier1
-JOIN (SELECT sid AS sid2, cost AS cost2 FROM ProductTag
-JOIN Catalog
-ON SuperTech.pid = Catalog.pid
+ON Catalog.sid = Suppliers.sid
+WHERE Suppliers.scountry = 'USA' AND ProductTag.tagname = 'Super Tech') AS Supplier1
+JOIN (SELECT Catalog.sid AS sid2, cost AS cost2 FROM Catalog
+JOIN ProductTag
+ON ProductTag.pid = Catalog.pid
 JOIN Suppliers
-ON SuperTech.sid = Suppliers.sid
-WHERE Suppliers.scountry = 'USA' AND ProductTag.tagname = 'SuperTech') AS Supplier2
-ON Supplier1.cost < Supplier2.cost2;
+ON Catalog.sid = Suppliers.sid
+WHERE Suppliers.scountry = 'USA' AND ProductTag.tagname = 'Super Tech') AS Supplier2
+ON Supplier1.cost < Supplier2.cost2) AS wanted;
 
 -- Query 1b ix --------------------------------------------------
 INSERT INTO Query1bix
