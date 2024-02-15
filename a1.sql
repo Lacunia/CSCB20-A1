@@ -4,6 +4,14 @@
 -- note: make sure to clean the query tables before testing.
 -- Query 1b i --------------------------------------------------
 INSERT INTO Query1bi 
+-- Find the names of the suppliers who supply some 'PPE' or 'Testing' product
+SELECT sname 
+FROM Catalog
+JOIN (SELECT * FROM ProductTag WHERE tagname = ‘PPE’ OR tagname = ‘Testing’)
+AS Tags 
+ON Tags.pid = Catalog.pid
+JOIN Suppliers
+ON Catalog.sid = Suppliers.sid;
 
 -- Query 1b ii --------------------------------------------------
 INSERT INTO Query1bii
@@ -17,7 +25,7 @@ SELECT sid
 FROM (SELECT * FROM ProductTag WHERE tagname = 'PPE') AS ppe
 JOIN Catalog 
 ON ppe.pid = Catalog.pid
-WHERE cost > 420
+WHERE cost > 420;
 
 
 -- Query 1b iii --------------------------------------------------
@@ -37,9 +45,18 @@ INSERT INTO Query1bvii
 
 -- Query 1b ix --------------------------------------------------
 INSERT INTO Query1bix
+-- SELECT pid
+-- FROM( SELECT pid, COUNT(pid)
+--     FROM Catalog 
+--     WHERE cost < 69 
+--     GROUP BY pid
+--     HAVING COUNT(pid) = (SELECT COUNT(sid) FROM Suppliers));
 
 -- Query 1b x --------------------------------------------------
 INSERT INTO Query1bx
+SELECT pid 
+FROM Inventory
+WHERE quantity = 0;
 
 
 -- Query 1c i --------------------------------------------------
