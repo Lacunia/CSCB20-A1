@@ -53,6 +53,12 @@ FROM(
 
 -- Query 1b v --------------------------------------------------
 INSERT INTO Query1bv
+SELECT supplier1.sid, supplier2.sid
+FROM Catalog AS supplier1 
+JOIN Catalog AS supplier2 
+ON supplier1.pid = supplier2.pid
+WHERE supplier1.sid < supplier2.sid AND supplier1.cost >= (supplier2.cost * 1.2);
+
 
 -- Query 1b vi --------------------------------------------------
 INSERT INTO Query1bvi
