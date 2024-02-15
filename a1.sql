@@ -35,7 +35,7 @@ FROM Suppliers
 -- we get rid of those who sell PPE at a cost of less than 10 or greater than 1337
 EXCEPT
 SELECT sid 
-FROM (SELECT * FROM ProductTag WHERE tagname = ‘PPE’) AS ppe
+FROM (SELECT * FROM ProductTag WHERE tagname = 'PPE') AS ppe
 JOIN (SELECT * FROM Catalog WHERE cost < 10 OR cost > 1337) AS RequiredCost
 ON ppe.pid = RequiredCost.pid;
 
@@ -46,9 +46,9 @@ SELECT sid
 FROM(
       SELECT sid, COUNT(pid)
       FROM Catalog JOIN ProductTag ON Catalog.pid = ProductTag.pid
-      WHERE tagname = ‘Cleaning’ 
+      WHERE tagname = 'Cleaning' 
       GROUP BY sid 
-      HAVING COUNT(pid) = (SELECT COUNT pid FROM ProductTag WHERE tagname = ‘Cleaning’)
+      HAVING COUNT(pid) = (SELECT COUNT pid FROM ProductTag WHERE tagname = 'Cleaning')
 );
 
 
