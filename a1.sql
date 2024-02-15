@@ -7,7 +7,7 @@ INSERT INTO Query1bi
 -- Find the names of the suppliers who supply some 'PPE' or 'Testing' product
 SELECT sname 
 FROM Catalog
-JOIN (SELECT * FROM ProductTag WHERE tagname = ‘PPE’ OR tagname = ‘Testing’)
+JOIN (SELECT * FROM ProductTag WHERE tagname = 'PPE' OR tagname = 'Testing')
 AS Tags 
 ON Tags.pid = Catalog.pid
 JOIN Suppliers
@@ -15,12 +15,16 @@ ON Catalog.sid = Suppliers.sid;
 
 -- Query 1b ii --------------------------------------------------
 INSERT INTO Query1bii
+-- finding sids of suppliers that supply 'PPE' under $10
 SELECT sid 
 FROM (SELECT * FROM ProductTag WHERE tagname = 'PPE') AS ppe
 JOIN Catalog 
 ON ppe.pid = Catalog.pid
 WHERE cost < 10
+
 INTERSECT 
+
+-- finding sids of suppliers that supply 'PPE' over 420
 SELECT sid 
 FROM (SELECT * FROM ProductTag WHERE tagname = 'PPE') AS ppe
 JOIN Catalog 
@@ -39,9 +43,9 @@ FROM (SELECT * FROM ProductTag WHERE tagname = 'PPE') AS ppe
 JOIN (SELECT * FROM Catalog WHERE cost < 10 OR cost > 1337) AS RequiredCost
 ON ppe.pid = RequiredCost.pid;
 
-
 -- Query 1b iv  --------------------------------------------------
 INSERT INTO Query1biv
+-- find sids of suppliers who supply every type of 'Cleaning' products in their catalog
 SELECT sid
 FROM(
       SELECT sid, COUNT(pid)
@@ -49,11 +53,13 @@ FROM(
       WHERE tagname = 'Cleaning' 
       GROUP BY sid 
       HAVING COUNT(pid) = (SELECT COUNT pid FROM ProductTag WHERE tagname = 'Cleaning')
-);
+) AS Wanted;
 
 
 -- Query 1b v --------------------------------------------------
 INSERT INTO Query1bv
+-- find paris of sids such that supplier with the first sid 
+-- charges 20% or more for some product than the supplier with the second sid
 SELECT supplier1.sid, supplier2.sid
 FROM Catalog AS supplier1 
 JOIN Catalog AS supplier2 
@@ -63,53 +69,38 @@ WHERE supplier1.sid < supplier2.sid AND supplier1.cost >= (supplier2.cost * 1.2)
 
 -- Query 1b vi --------------------------------------------------
 INSERT INTO Query1bvi
+-- find pids supplied by at least two different suppliers
 SELECT pid
-FROM ((SELECT * FROM Catalog
-JOIN Suppliers
-ON Catalog.sid = Suppliers.sid
-JOIN ProductTag
-ON Catalog.pid = ProductTag.pid) AS table1
-
-CROSS JOIN
-
-(SELECT *
-FROM Catalog
-JOIN Suppliers
-ON Catalog.sid = Suppliers.sid
-JOIN ProductTag
-ON Catalog.pid = ProductTag.pid
-WHERE Suppliers.scountry = 'USA' AND ProductTag.tagname = 'Supertech') AS table2)
-WHERE table1.pid = table2.pid AND table1.sid != table2.sid;
-
+FROM (SELECT sid AS sid1, pid AS pid1 FROM Catalog) AS Catalog1
+JOIN (SELECT sid AS sid2, pid AS pid2 FROM Catalog) AS Catalog2
+ON Catalog1.pid1 = Catalog2.pid2 AND Catalog1.sid1 != Catalog2.sid2;
 
 -- Query 1b vii --------------------------------------------------
 INSERT INTO Query1bvii
-SELECT sid
-FROM Catalog
+SELECT sid, cost
+FROM (SELECT * FROM ProductTag WHERE tagname = 'SuperTech') AS SuperTech
+JOIN Catalog
+ON SuperTech.pid = Catalog.pid
 JOIN Suppliers
-ON Catalog.sid = Suppliers.sid
-JOIN ProductTag
-ON Catalog.pid = ProductTag.pid
+ON SuperTech.sid = Suppliers.sid
+WHERE Suppliers.scountry = 'USA'
 
 EXCEPT
 
-(SELECT sid
-FROM (SELECT cost AS cost1 FROM Catalog
+SELECT sid, cost
+FROM (SELECT * FROM ProductTag
+JOIN Catalog
+ON SuperTech.pid = Catalog.pid
 JOIN Suppliers
-ON Catalog.sid = Suppliers.sid
-JOIN ProductTag
-ON Catalog.pid = ProductTag.pid
-WHERE Suppliers.scountry = 'USA' AND ProductTag.tagname = 'Supertech') AS table1
-
-CROSS JOIN 
-
-(SELECT cost AS cost2 FROM Catalog
+ON SuperTech.sid = Suppliers.sid
+WHERE Suppliers.scountry = 'USA' AND ProductTag.tagname = 'SuperTech') AS Supplier1
+JOIN (SELECT sid AS sid2, cost AS cost2 FROM ProductTag
+JOIN Catalog
+ON SuperTech.pid = Catalog.pid
 JOIN Suppliers
-ON Catalog.sid = Suppliers.sid
-JOIN ProductTag
-ON Catalog.pid = ProductTag.pid
-WHERE Suppliers.scountry = 'USA' AND ProductTag.tagname = 'Supertech') AS table2
-WHERE table1.cost1 > table2.cost2);
+ON SuperTech.sid = Suppliers.sid
+WHERE Suppliers.scountry = 'USA' AND ProductTag.tagname = 'SuperTech') AS Supplier2
+ON Supplier1.cost < Supplier2.cost2;
 
 -- Query 1b ix --------------------------------------------------
 INSERT INTO Query1bix
@@ -122,9 +113,23 @@ FROM( SELECT pid, COUNT(pid)
 
 -- Query 1b x --------------------------------------------------
 INSERT INTO Query1bx
+-- pid of items that have a quantity of 0 in inventory
 SELECT pid 
 FROM Inventory
-WHERE quantity = 0;
+WHERE quantity = 0
+
+UNION 
+
+-- pid of items that do not exist in inventory
+-- all the products
+(SELECT pid
+FROM Product
+
+EXCEPT
+
+-- all the products in Inventory
+SELECT pid
+FROM Inventory);
 
 
 -- Query 1c i --------------------------------------------------
