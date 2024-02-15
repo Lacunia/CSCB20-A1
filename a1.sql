@@ -77,6 +77,7 @@ ON Catalog1.pid1 = Catalog2.pid2 AND Catalog1.sid1 != Catalog2.sid2;
 
 -- Query 1b vii --------------------------------------------------
 INSERT INTO Query1bvii
+-- A copy that stores the requirements
 SELECT sid, cost
 FROM (SELECT * FROM ProductTag WHERE tagname = 'SuperTech') AS SuperTech
 JOIN Catalog
@@ -87,6 +88,7 @@ WHERE Suppliers.scountry = 'USA'
 
 EXCEPT
 
+-- A copy that stores the more expensive 'Super Tech' in 'USA'
 SELECT sid, cost
 FROM (SELECT * FROM ProductTag
 JOIN Catalog
