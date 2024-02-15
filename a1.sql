@@ -5,7 +5,7 @@
 -- Query 1b i --------------------------------------------------
 INSERT INTO Query1bi 
 -- Find the names of the suppliers who supply some 'PPE' or 'Testing' product
-SELECT sname 
+SELECT DISTINCT sname 
 FROM Catalog
 JOIN (SELECT * FROM ProductTag WHERE tagname = 'PPE' OR tagname = 'Testing')
 AS Tags 
