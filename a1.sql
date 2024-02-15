@@ -5,7 +5,7 @@
 -- Query 1b i --------------------------------------------------
 INSERT INTO Query1bi 
 -- Find the names of the suppliers who supply some 'PPE' or 'Testing' product
-SELECT sname 
+SELECT DISTINCT sname 
 FROM Catalog
 JOIN (SELECT * FROM ProductTag WHERE tagname = 'PPE' OR tagname = 'Testing')
 AS Tags 
@@ -350,18 +350,18 @@ FROM Employee;
 
 -- Query 2 viii --------------------------------------------------
 INSERT INTO Query2viii
--- selecting the utorid and email of students with vaxstatus '0' and exceeded any room's alert threshold
+--selecting the utorid and email of students with vaxstatus '0' and exceeded any room's alert threshold
 SELECT Member.utorid, Member.email
 -- finds all students with vacstatus '0'
-FROM Student
+FROM (((Student
 JOIN Member
-ON Student.utorid = Member.utorid AND Member.vacstatus = 0
+ON Student.utorid = Member.utorid AND Member.vacstatus = 0)
 -- finds all occurences of the students with vacstatus '0' occupying a space
 JOIN Occupancy
-ON Student.utorid = Occupancy.utorid AND Member.utorid = Occupancy.utorid
+ON Student.utorid = Occupancy.utorid AND Member.utorid = Occupancy.utorid)
 -- finds all occurences of the students with vacstatus '0' occupying a space that exceeds the room's alert threshold
 JOIN Room 
-ON Occupancy.roomid = Room.roomid AND Occupancy.alertlevel > Room.alertthreshold;
+ON Occupancy.roomid = Room.roomid AND Occupancy.alertlevel > Room.alertthreshold);
 
 
 
