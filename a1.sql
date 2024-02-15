@@ -41,6 +41,15 @@ ON ppe.pid = RequiredCost.pid;
 
 -- Query 1b iv  --------------------------------------------------
 INSERT INTO Query1biv
+SELECT sid
+FROM(
+      SELECT sid, COUNT(pid)
+      FROM Catalog JOIN ProductTag ON Catalog.pid = ProductTag.pid
+      WHERE tagname = ‘Cleaning’ 
+      GROUP BY sid 
+      HAVING COUNT(pid) = (SELECT COUNT pid FROM ProductTag WHERE tagname = ‘Cleaning’)
+);
+
 
 -- Query 1b v --------------------------------------------------
 INSERT INTO Query1bv
