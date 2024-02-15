@@ -42,15 +42,41 @@ INSERT INTO Query1bvi
 
 -- Query 1b vii --------------------------------------------------
 INSERT INTO Query1bvii
+SELECT sid
+FROM Catalog
+JOIN Suppliers
+ON Catalog.sid = Suppliers.sid
+JOIN ProductTag
+ON Catalog.pid = ProductTag.pid
+
+EXCEPT
+
+(SELECT sid
+FROM (SELECT cost AS cost1 FROM Catalog
+JOIN Suppliers
+ON Catalog.sid = Suppliers.sid
+JOIN ProductTag
+ON Catalog.pid = ProductTag.pid
+WHERE Suppliers.scountry = 'USA' AND ProductTag.tagname = 'Supertech') AS table1
+
+CROSS JOIN 
+
+(SELECT cost AS cost2 FROM Catalog
+JOIN Suppliers
+ON Catalog.sid = Suppliers.sid
+JOIN ProductTag
+ON Catalog.pid = ProductTag.pid
+WHERE Suppliers.scountry = 'USA' AND ProductTag.tagname = 'Supertech') AS table2
+WHERE table1.cost1 > table2.cost2);
 
 -- Query 1b ix --------------------------------------------------
 INSERT INTO Query1bix
--- SELECT pid
--- FROM( SELECT pid, COUNT(pid)
---     FROM Catalog 
---     WHERE cost < 69 
---     GROUP BY pid
---     HAVING COUNT(pid) = (SELECT COUNT(sid) FROM Suppliers));
+SELECT pid
+FROM( SELECT pid, COUNT(pid)
+    FROM Catalog 
+    WHERE cost < 69 
+    GROUP BY pid
+    HAVING COUNT(pid) = (SELECT COUNT(sid) FROM Suppliers))AS Wanted;
 
 -- Query 1b x --------------------------------------------------
 INSERT INTO Query1bx
