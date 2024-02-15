@@ -114,6 +114,7 @@ FROM( SELECT pid, COUNT(pid)
     GROUP BY pid
     HAVING COUNT(pid) = (SELECT COUNT(sid) FROM Suppliers))AS Wanted;
 
+
 -- Query 1b x --------------------------------------------------
 INSERT INTO Query1bx
 -- pid of items that have a quantity of 0 in inventory
@@ -125,16 +126,15 @@ UNION
 
 -- pid of items that do not exist in inventory
 -- all the products
-(SELECT pid
-FROM Product
-
-EXCEPT
-
--- all the products in Inventory
 SELECT pid
-FROM Inventory);
+FROM Product
+WHERE pid NOT IN (SELECT pid FROM Inventory);
 
 
+DELETE FROM Query1ci;
+DELETE FROM Query1cii;
+DELETE FROM Query1ciii;
+DELETE FROM Query1civ;
 -- Query 1c i --------------------------------------------------
 -- For each pair of suppliers that have a “business relationship” (*1) with each other, 
 -- find pids they both offer in their catalog, but which we do not have inventory of. 
@@ -207,7 +207,7 @@ WHERE subid NOT IN (SELECT subid FROM Subsuppliers WHERE Subsuppliers.sid = reci
 UNION
 
 SELECT DISTINCT reciprocal1.sid1, reciprocal1.sid2, subid, subname, subaddress
-FROM (SELECT sid AS sid1, subid AS sid2 FROM Subsuppliers) AS reciprocal16
+FROM (SELECT sid AS sid1, subid AS sid2 FROM Subsuppliers) AS reciprocal1
 JOIN (SELECT sid AS sid1, subid AS sid2 FROM Subsuppliers) AS reciprocal2
 ON reciprocal1.sid1 = reciprocal2.sid2 AND reciprocal1.sid2 = reciprocal2.sid1 
 -- we get the subsuppliers for reciprocal supplier 2, where the subsuppliers are not the reciprocal supplier 1
@@ -217,100 +217,111 @@ ON Subsuppliers.sid = reciprocal1.sid2 AND Subsuppliers.subid != reciprocal1.sid
 WHERE subid NOT IN (SELECT subid FROM Subsuppliers WHERE Subsuppliers.sid = reciprocal1.sid1 AND Subsuppliers.subid != reciprocal1.sid2);
 
 
+
 -- note: make sure to clean the query tables before testing.
+DELETE FROM Query2i;
+DELETE FROM Query2ii;
+DELETE FROM Query2iii;
+DELETE FROM Query2iv;
+DELETE FROM Query2v;
+DELETE FROM Query2vi;
+DELETE FROM Query2vii;
+DELETE FROM Query2viii;
+
 -- Query 2 i --------------------------------------------------
 INSERT INTO Query2i
 -- Selecting the table containing all the utorid from the Student table
 SELECT utorid
 FROM Student
-
 -- Subtracting the latter from the entire Student table
 EXCEPT
-
 -- Selecting all those utorids that are indeed approved for the room 'IC404'
 -- Select all utorid and theta join with the list of approved utorids for the room 'IC404'
-(SELECT utorid
+SELECT Student.utorid
 FROM Student
 -- Selected all the utorids that have access to room 'IC404'
 JOIN(SELECT * FROM Room JOIN Approved ON Room.roomid = Approved.roomid WHERE roomname = 'IC404') AS Approved1
-ON Student.utorid = Approved1.utorid);
+ON Student.utorid = Approved1.utorid;
 
 -- Query 2 ii --------------------------------------------------
 INSERT INTO Query2ii
 -- Getting the rooms that are approved for employees
-SELECT utorid
+SELECT DISTINCT utorid1
 -- copy 1
-FROM (SELECT utorid AS utorid1, roomid AS roomid1 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved1 
+FROM (SELECT Employee.utorid AS utorid1, roomid AS roomid1 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved1 
 -- copy 2
-JOIN (SELECT utorid AS utorid2, roomid AS roomid2 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved2
+JOIN (SELECT Employee.utorid AS utorid2, roomid AS roomid2 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved2
 -- Making sure there are at least two rooms approved under the same utorid
 ON Approved1.utorid1 = Approved2.utorid2 AND Approved1.roomid1 != Approved2.roomid2
 -- copy 3
-JOIN (SELECT utorid AS utorid3, roomid AS roomid3 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved3
+JOIN (SELECT Employee.utorid AS utorid3, roomid AS roomid3 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved3
 -- Making sure there are at least three rooms approved under the same utorid
-ON Approved1.utorid1 = Approved3.utorid3 AND Approved1.roomid1 != Approved3.roomid3 AND Approved.roomid2 != Approved.roomid3;
+ON Approved1.utorid1 = Approved3.utorid3 AND Approved1.roomid1 != Approved3.roomid3 AND Approved2.roomid2 != Approved3.roomid3;
+
 
 -- Query 2 iii --------------------------------------------------
 INSERT INTO Query2iii
 -- The idea is to subtract utorids with access to 4+ rooms from access to 3+ rooms to retain the ones with only access to exactly 3 rooms
 -- Getting the utorids with access to 3 or more rooms
-SELECT utorid
+SELECT utorid1
 -- copy 1
-FROM (SELECT utorid AS utorid1, roomid AS roomid1 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved1 
+FROM (SELECT Employee.utorid AS utorid1, roomid AS roomid1 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved1 
 -- copy 2
-JOIN (SELECT utorid AS utorid2, roomid AS roomid2 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved2
+JOIN (SELECT Employee.utorid AS utorid2, roomid AS roomid2 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved2
 -- Making sure there are at least two rooms approved under the same utorid
 ON Approved1.utorid1 = Approved2.utorid2 AND Approved1.roomid1 != Approved2.roomid2
 -- copy 3
-JOIN (SELECT utorid AS utorid3, roomid AS roomid3 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved3
+JOIN (SELECT Employee.utorid AS utorid3, roomid AS roomid3 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved3
 -- Making sure there are at least three rooms approved under the same utorid
-ON Approved1.utorid1 = Approved3.utorid3 AND Approved1.roomid1 != Approved3.roomid3 AND Approved.roomid2 != Approved.roomid3
+ON Approved1.utorid1 = Approved3.utorid3 AND Approved1.roomid1 != Approved3.roomid3 AND Approved2.roomid2 != Approved3.roomid3
 
 EXCEPT
 
 -- Getting the utorids with access to 4 or more rooms 
-(SELECT utorid
+SELECT utorid1
 -- copy 1
-FROM (SELECT utorid AS utorid1, roomid AS roomid1 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved1 
+FROM (SELECT Employee.utorid AS utorid1, roomid AS roomid1 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved1 
 -- copy 2
-JOIN (SELECT utorid AS utorid2, roomid AS roomid2 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved2
+JOIN (SELECT Employee.utorid AS utorid2, roomid AS roomid2 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved2
 -- Making sure there are at least two rooms approved under the same utorid
 ON Approved1.utorid1 = Approved2.utorid2 AND Approved1.roomid1 != Approved2.roomid2
 -- copy 3
-JOIN (SELECT utorid AS utorid3, roomid AS roomid3 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved3
+JOIN (SELECT Employee.utorid AS utorid3, roomid AS roomid3 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved3
 -- Making sure there are at least three rooms approved under the same utorid
-ON Approved1.utorid1 = Approved3.utorid3 AND Approved1.roomid1 != Approved3.roomid3 AND Approved.roomid2 != Approved.roomid3
+ON Approved1.utorid1 = Approved3.utorid3 AND Approved1.roomid1 != Approved3.roomid3 AND Approved2.roomid2 != Approved3.roomid3
 -- copy 4
-JOIN (SELECT utorid AS utorid3, roomid AS roomid3 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved4
+JOIN (SELECT Employee.utorid AS utorid4, roomid AS roomid4 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved4
 -- There are at least 4 different rooms under the same utorid
-ON Approved1.utorid1 = Approved2.utorid2 AND Approved1.roomid1 != Approved4.roomid4 AND Approved2.roomid2 != Approved4.roomid4 AND Approved3.roomid3 != Approved4.roomid4);
+ON Approved1.utorid1 = Approved4.utorid4 AND Approved1.roomid1 != Approved4.roomid4 AND Approved2.roomid2 != Approved4.roomid4 AND Approved3.roomid3 != Approved4.roomid4;
+
 
 -- Query 2 iv  --------------------------------------------------
 INSERT INTO Query2iv
 -- The idea is to subtract utorids with access to 4+ rooms from access to all rooms to retain the ones with only access to 3 or less rooms
 -- Getting the utorids with access to 3 or more rooms
-SELECT utorid
+SELECT Employee.utorid
 -- copy 1
 FROM Employee JOIN Approved ON Employee.utorid = Approved.utorid
 
 EXCEPT
 
 -- Getting the utorids with access to 4 or more rooms 
-(SELECT utorid
+SELECT utorid1
 -- copy 1
-FROM (SELECT utorid AS utorid1, roomid AS roomid1 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved1 
+FROM (SELECT Employee.utorid AS utorid1, roomid AS roomid1 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved1 
 -- copy 2
-JOIN (SELECT utorid AS utorid2, roomid AS roomid2 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved2
+JOIN (SELECT Employee.utorid AS utorid2, roomid AS roomid2 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved2
 -- Making sure there are at least two rooms approved under the same utorid
 ON Approved1.utorid1 = Approved2.utorid2 AND Approved1.roomid1 != Approved2.roomid2
 -- copy 3
-JOIN (SELECT utorid AS utorid3, roomid AS roomid3 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved3
+JOIN (SELECT Employee.utorid AS utorid3, roomid AS roomid3 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved3
 -- Making sure there are at least three rooms approved under the same utorid
-ON Approved1.utorid1 = Approved3.utorid3 AND Approved1.roomid1 != Approved3.roomid3 AND Approved.roomid2 != Approved.roomid3
+ON Approved1.utorid1 = Approved3.utorid3 AND Approved1.roomid1 != Approved3.roomid3 AND Approved2.roomid2 != Approved3.roomid3
 -- copy 4
-JOIN (SELECT utorid AS utorid3, roomid AS roomid3 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved4
+JOIN (SELECT Employee.utorid AS utorid4, roomid AS roomid4 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved4
 -- There are at least 4 different rooms under the same utorid
-ON Approved1.utorid1 = Approved2.utorid2 AND Approved1.roomid1 != Approved4.roomid4 AND Approved2.roomid2 != Approved4.roomid4 AND Approved3.roomid3 != Approved4.roomid4);
+ON Approved1.utorid1 = Approved4.utorid4 AND Approved1.roomid1 != Approved4.roomid4 AND Approved2.roomid2 != Approved4.roomid4 AND Approved3.roomid3 != Approved4.roomid4;
+
 
 -- Query 2 v --------------------------------------------------
 INSERT INTO Query2v
@@ -324,23 +335,29 @@ JOIN Approved
 ON Student_O_L.utorid = Approved.utorid
 -- joining Occupancy table to find out all occurences of these rooms being occupied between 2022-09-01 and 2022-12-31
 JOIN Occupancy
-ON Approved.roomid = Occupancy.roomid AND (Occupancy.date Between 2022-09-01 AND 2022-12-31)
+ON Approved.roomid = Occupancy.roomid AND (Occupancy.date BETWEEN '2022-09-01' AND '2022-12-31')
 -- joining Room table to find all occurences of when alert level is above the alert threshold level
 JOIN Room
 ON Approved.roomid = Room.roomid AND Occupancy.alertlevel > Room.alertthreshold;
 
+
 -- Query 2 vi --------------------------------------------------
 INSERT INTO Query2vi
 -- select utorid of occupancy of rooms that are not approved within this time period
-SELECT utorid
+SELECT DISTINCT utorid
 -- from a table that contains all the occupancy occurences between the desired dates
-FROM (SELECT utorid, roomid FROM Occupancy WHERE Occupancy.data Between 2021-03-17 AND 2022-12-31) AS Occupied
+FROM (
+SELECT utorid, roomid 
+FROM Occupancy 
+WHERE Occupancy.date Between '2021-03-17' AND '2022-12-31'
 
 EXCEPT
 
 -- only containing approved occupancy of rooms
-(SELECT *
-FROM Approved);
+SELECT *
+FROM Approved
+);
+
 
 -- Query 2 vii --------------------------------------------------
 INSERT INTO Query2vii
@@ -356,7 +373,7 @@ SELECT Member.utorid, Member.email
 -- finds all students with vacstatus '0'
 FROM Student
 JOIN Member
-ON Student.utorid = Member.utorid AND Member.vacstatus = 0
+ON Student.utorid = Member.utorid AND Member.vaxstatus = 0
 -- finds all occurences of the students with vacstatus '0' occupying a space
 JOIN Occupancy
 ON Student.utorid = Occupancy.utorid AND Member.utorid = Occupancy.utorid

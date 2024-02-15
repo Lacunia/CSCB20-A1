@@ -25,7 +25,7 @@ ON Student.utorid = Approved1.utorid;
 -- Query 2 ii --------------------------------------------------
 INSERT INTO Query2ii
 -- Getting the rooms that are approved for employees
-SELECT utorid1
+SELECT DISTINCT utorid1
 -- copy 1
 FROM (SELECT Employee.utorid AS utorid1, roomid AS roomid1 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved1 
 -- copy 2
@@ -36,6 +36,7 @@ ON Approved1.utorid1 = Approved2.utorid2 AND Approved1.roomid1 != Approved2.room
 JOIN (SELECT Employee.utorid AS utorid3, roomid AS roomid3 FROM (Employee JOIN Approved ON Employee.utorid = Approved.utorid)) AS Approved3
 -- Making sure there are at least three rooms approved under the same utorid
 ON Approved1.utorid1 = Approved3.utorid3 AND Approved1.roomid1 != Approved3.roomid3 AND Approved2.roomid2 != Approved3.roomid3;
+
 
 -- Query 2 iii --------------------------------------------------
 INSERT INTO Query2iii
@@ -72,6 +73,7 @@ JOIN (SELECT Employee.utorid AS utorid4, roomid AS roomid4 FROM (Employee JOIN A
 -- There are at least 4 different rooms under the same utorid
 ON Approved1.utorid1 = Approved4.utorid4 AND Approved1.roomid1 != Approved4.roomid4 AND Approved2.roomid2 != Approved4.roomid4 AND Approved3.roomid3 != Approved4.roomid4;
 
+
 -- Query 2 iv  --------------------------------------------------
 INSERT INTO Query2iv
 -- The idea is to subtract utorids with access to 4+ rooms from access to all rooms to retain the ones with only access to 3 or less rooms
@@ -99,6 +101,7 @@ JOIN (SELECT Employee.utorid AS utorid4, roomid AS roomid4 FROM (Employee JOIN A
 -- There are at least 4 different rooms under the same utorid
 ON Approved1.utorid1 = Approved4.utorid4 AND Approved1.roomid1 != Approved4.roomid4 AND Approved2.roomid2 != Approved4.roomid4 AND Approved3.roomid3 != Approved4.roomid4;
 
+
 -- Query 2 v --------------------------------------------------
 INSERT INTO Query2v
 --In this case, we are accounting for all cases of when the alert level has exceeded the threshold, regardless of whether it was triggered by Oscar Lin or not
@@ -111,20 +114,21 @@ JOIN Approved
 ON Student_O_L.utorid = Approved.utorid
 -- joining Occupancy table to find out all occurences of these rooms being occupied between 2022-09-01 and 2022-12-31
 JOIN Occupancy
-ON Approved.roomid = Occupancy.roomid AND (Occupancy.date Between 2022-09-01 AND 2022-12-31)
+ON Approved.roomid = Occupancy.roomid AND (Occupancy.date BETWEEN '2022-09-01' AND '2022-12-31')
 -- joining Room table to find all occurences of when alert level is above the alert threshold level
 JOIN Room
 ON Approved.roomid = Room.roomid AND Occupancy.alertlevel > Room.alertthreshold;
 
+
 -- Query 2 vi --------------------------------------------------
 INSERT INTO Query2vi
 -- select utorid of occupancy of rooms that are not approved within this time period
-SELECT utorid
+SELECT DISTINCT utorid
 -- from a table that contains all the occupancy occurences between the desired dates
 FROM (
 SELECT utorid, roomid 
 FROM Occupancy 
-WHERE Occupancy.date Between 2021-03-17 AND 2022-12-31
+WHERE Occupancy.date Between '2021-03-17' AND '2022-12-31'
 
 EXCEPT
 
