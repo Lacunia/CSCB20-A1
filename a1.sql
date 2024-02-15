@@ -39,6 +39,7 @@ FROM (SELECT * FROM ProductTag WHERE tagname = ‘PPE’) AS ppe
 JOIN (SELECT * FROM Catalog WHERE cost < 10 OR cost > 1337) AS RequiredCost
 ON ppe.pid = RequiredCost.pid;
 
+
 -- Query 1b iv  --------------------------------------------------
 INSERT INTO Query1biv
 SELECT sid
@@ -79,6 +80,7 @@ JOIN ProductTag
 ON Catalog.pid = ProductTag.pid
 WHERE Suppliers.scountry = 'USA' AND ProductTag.tagname = 'Supertech') AS table2)
 WHERE table1.pid = table2.pid AND table1.sid != table2.sid;
+
 
 -- Query 1b vii --------------------------------------------------
 INSERT INTO Query1bvii
